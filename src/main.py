@@ -12,3 +12,29 @@
     upload 2 panorama sequences having the same name conventions the examples - in /data/inp/mine
 
 '''
+
+from __future__ import print_function
+import cv2 as cv
+import numpy as np
+import argparse
+
+from geometricTransformation import findFeatures
+
+
+def generatePanorama():
+    img1 = cv.imread('../data/inp/examples/backyard1.jpg', cv.IMREAD_GRAYSCALE)
+    img2 = cv.imread('../data/inp/examples/backyard2.jpg', cv.IMREAD_GRAYSCALE)
+    img3 = cv.imread('../data/inp/examples/backyard3.jpg', cv.IMREAD_GRAYSCALE)
+    my_images = [img1, img2, img3]
+
+    for k in my_images:
+        if k is None:
+            print('Could not open or find the images!')
+            exit(0)
+
+    for k in range(len(my_images) - 1):
+        print(k)
+        findFeatures(my_images[k], my_images[k + 1])
+
+
+generatePanorama();
