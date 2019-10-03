@@ -12,7 +12,7 @@ import cv2 as cv
 import numpy as np
 import argparse
 
-def findFeatures(img1, img2):
+def findMatchFeatures(img1, img2):
     # -- Step 1: Detect the keypoints using SURF Detector, compute the descriptors
     detector = cv.xfeatures2d.SIFT_create(0, 3, 0)
     # detector = cv.xfeatures2d_SURF.create(hessianThreshold=minHessian)
@@ -29,8 +29,7 @@ def findFeatures(img1, img2):
     ratio_thresh = 0.5
     good_matches = []
     good_matches2 = []
-    pos1 = []
-    pos2 = []
+    corrList = []
     for m, n in knn_matches:
         if m.distance < ratio_thresh * n.distance:
             good_matches.append(m)
@@ -39,22 +38,10 @@ def findFeatures(img1, img2):
             img2_idx = n.trainIdx
             [x1, y1] = keypoints1[img1_idx].pt
             [x2, y2] = keypoints2[img2_idx].pt
-            pos1.append([x1,y1])
-            pos2.append([x2, y2])
+            corrList.append([x1,y1, x2, y2])
+            #  pos2.append([x2, y2])
+    #  print(corrList)
+    return corrList
 
-    return pos1, pos2
 
-    # print the points (x,y) for each picture.
-    # print(pos1)
-
-'''
-    # -- Draw matches
-    img_matches = np.empty((max(img1.shape[0], img2.shape[0]), img1.shape[1] + img2.shape[1], 3), dtype=np.uint8)
-    cv.drawMatches(img1, keypoints1, img2, keypoints2, good_matches, img_matches,
-                   flags=cv.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
-    # -- Show detected matches
-
-    cv.imshow('Good Matches', img_matches)
-    cv.waitKey()
-    '''
 
