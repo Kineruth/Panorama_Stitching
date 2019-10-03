@@ -18,7 +18,8 @@ import cv2 as cv
 import numpy as np
 import argparse
 
-from geometricTransformation import findMatchFeatures
+from geometricTransformation import *
+
 
 
 def generatePanorama():
@@ -36,7 +37,7 @@ def generatePanorama():
         print(k)
         corrList = findMatchFeatures(my_images[k], my_images[k + 1])
         #  run RANSAC algorithm
-        homography, inliersList = ransac(corrs, estimation_thresh)
+        homography, inliersList = ransacHomography(corrList, 0.60)
 
 
 generatePanorama();
