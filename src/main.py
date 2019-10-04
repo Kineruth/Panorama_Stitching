@@ -19,7 +19,7 @@ import numpy as np
 import argparse
 
 from geometricTransformation import *
-
+from panoramaStitching import *
 
 
 def generatePanorama():
@@ -33,11 +33,20 @@ def generatePanorama():
             print('Could not open or find the images!')
             exit(0)
 
+    homography_list = [] #size = len(my_images)-1
     for k in range(len(my_images) - 1): #  each consecutive images
         print(k)
         corrList = findMatchFeatures(my_images[k], my_images[k + 1])
         #  run RANSAC algorithm
         homography, inliersList = ransacHomography(corrList, 0.60)
+        homography_list.append(homography)
+
+    accumulateHomographies(my_images, homography_list)
 
 
-generatePanorama();
+def main():
+    generatePanorama()
+
+
+if __name__ == "__main__":
+    main()

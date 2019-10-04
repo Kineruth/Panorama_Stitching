@@ -13,3 +13,11 @@
         of the full lateral range [Xmin, Xmax]
     6) (back)wrap the images on to the strips of the panorama.
 '''
+
+import cv2 as cv
+import numpy as np
+
+def accumulateHomographies(my_images, homography_list):
+    middle_frame = np.ceil(my_images[len(my_images)/2])
+
+    return 0
