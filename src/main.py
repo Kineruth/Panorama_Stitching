@@ -17,6 +17,7 @@ from __future__ import print_function
 import cv2 as cv
 import numpy as np
 import argparse
+import math
 
 from geometricTransformation import *
 from panoramaStitching import *
@@ -41,8 +42,8 @@ def generatePanorama():
         homography, inliersList = ransacHomography(corrList, 0.60)
         homography_list.append(homography)
 
-    accumulateHomographies(my_images, homography_list)
-
+    m = math.ceil(len(my_images) / 2)  # Index of middle image rounded up, for common coordinate system
+    res = accumulateHomographies(homography_list, m)
 
 def main():
     generatePanorama()

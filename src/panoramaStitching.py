@@ -17,7 +17,44 @@
 import cv2 as cv
 import numpy as np
 
-def accumulateHomographies(my_images, homography_list):
-    middle_frame = np.ceil(my_images[len(my_images)/2])
+def accumulateHomographies(Hpair, m):
+    #Result
+    Htot = []
+    if len(Hpair) == 2:
+        H1 = np.matmul(Hpair[1], Hpair[0])
+        H2 = np.identity(3)
+        H3 = np.matmul(np.linalg.inv(Hpair[0]), np.linalg.inv(Hpair[1]))
+        Htot.append(H1)
+        Htot.append(H2)
+        Htot.append(H3)
+        return Htot
 
-    return 0
+    # m>2
+    Htemp = []
+    # i < m
+    for j in range(m):
+        k = m-1
+        H_im = Hpair[k]
+        i = m
+        while i > j:
+            H_im = np.matmul(H_im, Hpair[i])
+            i = i-1
+        Htemp.append(H_im)
+
+    for i in reversed(Htemp):
+        Htot.append(i)
+
+    # i == m
+    H_im = np.identity(3)
+    Htot.append(H_im)
+
+    # i > m
+    for j in range(m, len(Hpair)-1):
+        H_im = np.linalg.inv(Hpair[j])
+        for i in range(j, len(Hpair)):
+            inverseH = np.linalg.inv(Hpair[i+1])
+            H_im = np.matmul(H_im, inverseH)
+        Htot.append(H_im)
+
+
+    return Htot
