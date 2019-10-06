@@ -17,7 +17,7 @@
 import cv2 as cv
 import numpy as np
 
-def accumulateHomographies(Hpair, m):
+def accumulateHomographies(Hpair, m):  # m was not reduced to (m-1)
     #Result
     Htot = []
     if len(Hpair) == 2:
@@ -33,10 +33,10 @@ def accumulateHomographies(Hpair, m):
     Htemp = []
     # i < m
     for j in range(m):
-        k = m-1
+        k = m-1  #  maybe not here
         H_im = Hpair[k]
-        i = m
-        while i > j:
+        i = k-1
+        while i >= j:
             H_im = np.matmul(H_im, Hpair[i])
             i = i-1
         Htemp.append(H_im)
