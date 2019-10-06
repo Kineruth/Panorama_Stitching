@@ -11,13 +11,16 @@ from __future__ import print_function
 import cv2 as cv
 import numpy as np
 import random
-
 import argparse
 
-from main import pos1, pos2, matches
+matches = []
+pos1 = []
+pos2 = []
 
 
 def findMatchFeatures(img1, img2):
+    global matches, pos1, pos2
+
     # -- Step 1: Detect the keypoints using SURF Detector, compute the descriptors
     detector = cv.xfeatures2d.SIFT_create(0, 3, 0)
     # detector = cv.xfeatures2d_SURF.create(hessianThreshold=minHessian)
@@ -29,6 +32,7 @@ def findMatchFeatures(img1, img2):
     # Since SURF is a floating-point descriptor NORM_L2 is used
     matcher = cv.DescriptorMatcher_create(cv.DescriptorMatcher_FLANNBASED)
     knn_matches = matcher.knnMatch(descriptors1, descriptors2, 2)
+    matches = knn_matches
 
     # -- Filter matches using the Lowe's ratio test
     ratio_thresh = 0.5
@@ -45,13 +49,12 @@ def findMatchFeatures(img1, img2):
             [x2, y2] = keypoints2[img2_idx].pt
             corrList.append([x1, y1, x2, y2])
             pos1.append([x1, y1])  # save for display lines
-            pos2.append([x2, y2])  # save for display lines
+            pos2.append([x1, y1])  # save for display lines
     #  print(corrList)
-    matches = good_matches
     return corrList
 
 
-def applyHomography(corrList,h):
+def applyHomography(corrList, h):
     #  transforms pos1 points (from image 1) to pos2 using the homography we found
     #  returns all estimated transposed points (from image 1 to image 2 using homography)
     estimatedPos2 = []
@@ -141,3 +144,72 @@ def ransacHomography(corrList, threshold):
         if len(maxInliers) > (len(corrList) * threshold):
             break
     return finalHomography, maxInliers
+
+
+'''
+    ! displayMatches FUNCTION !
+
+    runs on an image pair in each one of the provided sequences,
+    together with its match points pos1 pos2 (obtained from findFeatures & matchFeatures),
+    and inlier index set 'inlind' (obtained from ransacHomography).
+    inliers -  blue line
+    outliers - yellow line
+'''
+
+
+def displayMatches(pos1, pos2, img1, img2, inliers):
+    #  matchesMask = [[0, 0] for i in range(len(matches))]
+    #  # ratio test as per Lowe's paper
+    #  for i, (m, n) in enumerate(matches):
+    #      if m.distance < 0.7 * n.distance:
+    #          matchesMask[i] = [1, 0]
+    #
+    #  draw_params = dict(matchColor=(0, 255, 0),
+    #                     singlePointColor=(255, 0, 0),
+    #                     matchesMask=matchesMask,
+    #                     flags=0)
+    #  res = cv.drawMatchesKnn(img1, pos1, img2, pos2,matches,inliers,**draw_params)
+    # # res = cv.drawMatches(img1, pos1, img2, pos2, matches, inliers, **draw_params)
+    matchImg = drawMatches(img1, pos1, img2, pos2, inliers)
+    cv.imwrite('matched images.png', matchImg)
+
+
+def drawMatches(img1, pos1, img2, pos2, inliers):
+    # Create a new output image that concatenates the two images together
+    rows1 = img1.shape[0]
+    cols1 = img1.shape[1]
+    rows2 = img2.shape[0]
+    cols2 = img2.shape[1]
+
+    out = np.zeros((max([rows1, rows2]), cols1 + cols2, 3), dtype='uint8')
+
+    # Place the first image to the left
+    out[:rows1, :cols1, :] = np.dstack([img1, img1, img1])
+
+    # Place the next image to the right of it
+    out[:rows2, cols1:cols1 + cols2, :] = np.dstack([img2, img2, img2])
+
+    # For each pair of points we have between both images
+    # draw circles, then connect a line between them
+    for i in range(len(pos1)):
+        inlier = False
+
+        if inliers is not None:
+            for j in inliers:
+                if j[0] == pos1[i][0] and j[1] == pos1[i][1] and j[2] == pos2[i][0] and j[3] == pos2[i][1]:
+                    inlier = True
+
+        # Draw a small circle at both co-ordinates
+        cv.circle(out, (int(pos1[i][0]), int(pos1[i][1])), 4, ( 0, 0, 255), 1)
+        cv.circle(out, (int(pos2[i][0]) + cols1, int(pos2[i][1])), 4, (0, 0, 255), 1)
+
+        # Draw a line in between the two points, draw inliers if we have them
+        if inliers is not None and inlier:
+            cv.line(out, (int(pos1[i][0]), int(pos1[i][1])), (int(pos2[i][0]) + cols1, int(pos2[i][1])), (255,255,0), 1)
+        elif inliers is not None:
+            cv.line(out, (int(pos1[i][0]), int(pos1[i][1])), (int(pos2[i][0]) + cols1, int(pos2[i][1])), (255, 0, ), 1)
+
+        if inliers is None:
+            cv.line(out, (int(pos1[i][0]), int(pos1[i][1])), (int(pos2[i][0]) + cols1, int(pos2[i][1])), (255, 0, 0), 1)
+
+    return out

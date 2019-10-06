@@ -21,13 +21,11 @@ import math
 
 from geometricTransformation import *
 from panoramaStitching import *
-from display import *
 
-pos1 = []
-pos2 = []
-matches = []
+
 
 def generatePanorama():
+
     img1 = cv.imread('../data/inp/examples/backyard1.jpg', cv.IMREAD_GRAYSCALE)
     img2 = cv.imread('../data/inp/examples/backyard2.jpg', cv.IMREAD_GRAYSCALE)
     img3 = cv.imread('../data/inp/examples/backyard3.jpg', cv.IMREAD_GRAYSCALE)
