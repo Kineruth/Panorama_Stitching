@@ -49,8 +49,9 @@ def findMatchFeatures(img1, img2):
             [x2, y2] = keypoints2[img2_idx].pt
             corrList.append([x1, y1, x2, y2])
             pos1.append([x1, y1])  # save for display lines
-            pos2.append([x1, y1])  # save for display lines
+            pos2.append([x2, y2])  # save for display lines
     #  print(corrList)
+    print("pos2 find: "+str(pos2[0]))
     return corrList
 
 
@@ -134,7 +135,7 @@ def ransacHomography(corrList, threshold):
         # NEED TO SEND P1 POINTS & H TO applyHomography, then calc Ej & inliers
         # runs over each pair of matched points [x1,y1,x'1,y'1]
 
-        inliers = geometricDistance(corrList, h, 5)  # why inlierTol is 5 ??
+        inliers = geometricDistance(corrList, h, 2)  # why inlierTol is 5 ??
 
         if len(inliers) > len(maxInliers):
             maxInliers = inliers
@@ -170,11 +171,11 @@ def displayMatches(pos1, pos2, img1, img2, inliers):
     #                     flags=0)
     #  res = cv.drawMatchesKnn(img1, pos1, img2, pos2,matches,inliers,**draw_params)
     # # res = cv.drawMatches(img1, pos1, img2, pos2, matches, inliers, **draw_params)
-    matchImg = drawMatches(img1, pos1, img2, pos2, inliers)
-    cv.imwrite('matched images.png', matchImg)
+    matchImg = drawMatches(img1, img2, inliers)
+    cv.imwrite('../data/inp/examples/matched images.png', matchImg)
 
 
-def drawMatches(img1, pos1, img2, pos2, inliers):
+def drawMatches(img1, img2, inliers):
     # Create a new output image that concatenates the two images together
     rows1 = img1.shape[0]
     cols1 = img1.shape[1]
@@ -200,16 +201,20 @@ def drawMatches(img1, pos1, img2, pos2, inliers):
                     inlier = True
 
         # Draw a small circle at both co-ordinates
-        cv.circle(out, (int(pos1[i][0]), int(pos1[i][1])), 4, ( 0, 0, 255), 1)
+        cv.circle(out, (int(pos1[i][0]), int(pos1[i][1])), 4, (0, 0, 255), 1)
         cv.circle(out, (int(pos2[i][0]) + cols1, int(pos2[i][1])), 4, (0, 0, 255), 1)
 
         # Draw a line in between the two points, draw inliers if we have them
         if inliers is not None and inlier:
-            cv.line(out, (int(pos1[i][0]), int(pos1[i][1])), (int(pos2[i][0]) + cols1, int(pos2[i][1])), (255,255,0), 1)
+            cv.line(out, (int(pos1[i][0]), int(pos1[i][1])), (int(pos2[i][0]) + cols1, int(pos2[i][1])), (255,0,0), 1)
+            "in inlier!!!!!!!!!!!!!!!!!"
+            print("pos2 draw: "+ str(pos2[i])+"inlier draw: "+ str(j))
         elif inliers is not None:
-            cv.line(out, (int(pos1[i][0]), int(pos1[i][1])), (int(pos2[i][0]) + cols1, int(pos2[i][1])), (255, 0, ), 1)
+            cv.line(out, (int(pos1[i][0]), int(pos1[i][1])), (int(pos2[i][0]) + cols1, int(pos2[i][1])), (0, 255,255), 1)
+            print("in not inlier.........................")
 
         if inliers is None:
-            cv.line(out, (int(pos1[i][0]), int(pos1[i][1])), (int(pos2[i][0]) + cols1, int(pos2[i][1])), (255, 0, 0), 1)
+            cv.line(out, (int(pos1[i][0]), int(pos1[i][1])), (int(pos2[i][0]) + cols1, int(pos2[i][1])), (0, 0, 0), 1)
+            print("in NO inliers~~~~~~~~~~~~~~~~~")
 
     return out
