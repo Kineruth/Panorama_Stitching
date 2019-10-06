@@ -25,6 +25,7 @@ from display import *
 
 pos1 = []
 pos2 = []
+matches = []
 
 def generatePanorama():
     img1 = cv.imread('../data/inp/examples/backyard1.jpg', cv.IMREAD_GRAYSCALE)
