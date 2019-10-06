@@ -21,7 +21,11 @@ import math
 
 from geometricTransformation import *
 from panoramaStitching import *
+from display import *
 
+pos1 = []
+pos2 = []
+matches = []
 
 def generatePanorama():
     img1 = cv.imread('../data/inp/examples/backyard1.jpg', cv.IMREAD_GRAYSCALE)
@@ -35,15 +39,17 @@ def generatePanorama():
             exit(0)
 
     homography_list = [] #size = len(my_images)-1
+
     for k in range(len(my_images) - 1): #  each consecutive images
         print(k)
         corrList = findMatchFeatures(my_images[k], my_images[k + 1])
         #  run RANSAC algorithm
         homography, inliersList = ransacHomography(corrList, 0.60)
         homography_list.append(homography)
-
+        displayMatches(pos1, pos2, my_images[k], my_images[k + 1], inliersList)
+    # ************************ AFTER RUNNING ALL PAIR IMAGES ************************
     m = math.ceil(len(my_images) / 2)  # Index of middle image rounded up, for common coordinate system
-    res = accumulateHomographies(homography_list, m)
+    Htot = accumulateHomographies(homography_list, m)
 
 def main():
     generatePanorama()
