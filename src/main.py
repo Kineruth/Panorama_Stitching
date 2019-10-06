@@ -20,10 +20,12 @@ import argparse
 import math
 
 from geometricTransformation import *
-from panoramaStitching import *
-from display import *
+from panoramaStitching import accumulateHomographies
+from display import displayMatches
 
-pos1, pos2 = []
+pos1 = []
+pos2 = []
+matches = []
 
 def generatePanorama():
     img1 = cv.imread('../data/inp/examples/backyard1.jpg', cv.IMREAD_GRAYSCALE)

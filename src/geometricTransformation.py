@@ -14,7 +14,7 @@ import random
 
 import argparse
 
-from main import pos1, pos2
+from main import pos1, pos2, matches
 
 
 def findMatchFeatures(img1, img2):
@@ -47,6 +47,7 @@ def findMatchFeatures(img1, img2):
             pos1.append([x1, y1])  # save for display lines
             pos2.append([x2, y2])  # save for display lines
     #  print(corrList)
+    matches = good_matches
     return corrList
 
 
@@ -76,7 +77,7 @@ def geometricDistance(corrList, h, inlierTol):
 
         error = p2 - estimateP2
         error = np.linalg.norm(error)
-        print(error)
+        # print(error)
 
         if error < inlierTol:
             inliers.append(corrList[i])
@@ -135,7 +136,7 @@ def ransacHomography(corrList, threshold):
         if len(inliers) > len(maxInliers):
             maxInliers = inliers
             finalHomography = h
-        print("CorrList size: ", len(corrList), ", NumInliers: ", len(inliers), ", MaxInliers: ", len(maxInliers))
+        # print("CorrList size: ", len(corrList), ", NumInliers: ", len(inliers), ", MaxInliers: ", len(maxInliers))
 
         if len(maxInliers) > (len(corrList) * threshold):
             break
