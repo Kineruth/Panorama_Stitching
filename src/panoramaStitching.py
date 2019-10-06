@@ -55,6 +55,7 @@ def accumulateHomographies(Hpair, m):  # m was not reduced to (m-1)
     H_im = np.identity(3)
     Htot.append(H_im)
     '''
+
     # i > m
     for j in range(m, len(Hpair)-1):
         H_im = np.linalg.inv(Hpair[j])
