@@ -13,10 +13,11 @@ import numpy as np
 
 
 def displayMatches(pos1, pos2, img1 , img2, inliers):
-    matches_mask = np.ravel().tolist()
-    draw_params = dict(matchesMask=matches_mask,
+    #matches_mask = np.ravel().tolist()
+    draw_params = dict(matchesMask=None,
                        singlePointColor=None,
                        matchColor=(255, 0, 0),
                        flags=2)
-    res = cv.drawMatches(img1, pos1, img2, pos2, inliers, None, **draw_params)
+    img_matches = np.empty((max(img1.shape[0], img2.shape[0]), img1.shape[1] + img2.shape[1], 3), dtype=np.uint8)
+    res = cv.drawMatches(img1, pos1, img2, pos2, inliers, img_matches,  flags=cv.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
     cv.imshow('matched images', res)

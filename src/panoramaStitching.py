@@ -17,10 +17,11 @@
 import cv2 as cv
 import numpy as np
 
+
 def accumulateHomographies(Hpair, m):  # m was not reduced to (m-1)
-    #Result
+    # Result
     Htot = []
-    if len(Hpair) == 2:
+    if len(Hpair) == 2:  # only two frames
         H1 = np.matmul(Hpair[1], Hpair[0])
         H2 = np.identity(3)
         H3 = np.matmul(np.linalg.inv(Hpair[0]), np.linalg.inv(Hpair[1]))
@@ -29,16 +30,14 @@ def accumulateHomographies(Hpair, m):  # m was not reduced to (m-1)
         Htot.append(H3)
         return Htot
 
-    # m>2
-    Htemp = []
-    # i < m
-    for j in range(m):
-        k = m-1  #  maybe not here
-        H_im = Hpair[k]
-        i = k-1
-        while i >= j:
-            H_im = np.matmul(H_im, Hpair[i])
-            i = i-1
+    # more than 2 frames - 3 cases:
+    # CASE 1 --> i < m
+    for i in range(m):
+        H_im = Hpair[m]
+        k = m - 1
+        while k >= i:
+            H_im = np.matmul(H_im, Hpair[k])
+            k -= 1
         # Htemp.append(H_im)
         Htot.append(H_im)
 
@@ -55,13 +54,20 @@ def accumulateHomographies(Hpair, m):  # m was not reduced to (m-1)
     H_im = np.identity(3)
     Htot.append(H_im)
     '''
-    # i > m
-    for j in range(m, len(Hpair)-1):
-        H_im = np.linalg.inv(Hpair[j])
-        for i in range(j, len(Hpair)):
-            inverseH = np.linalg.inv(Hpair[i+1])
-            H_im = np.matmul(H_im, inverseH)
+    # CASE 2 --> i == m
+    if i == m:
+        H_im = np.identity(3)
         Htot.append(H_im)
+        i += 1
 
+    # CASE 3 --> i > m
+    for i in range(m + 1, len(Hpair) - 1):
+        k = m + 1
+        H_im = np.linalg.inv(Hpair[m])
+        while k <= i:
+            inverseH = np.linalg.inv(Hpair[k])
+            H_im = np.matmul(H_im, inverseH)
+            k += 1
+        Htot.append(H_im)
 
     return Htot
