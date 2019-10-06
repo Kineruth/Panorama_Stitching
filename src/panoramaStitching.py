@@ -39,10 +39,11 @@ def accumulateHomographies(Hpair, m):  # m was not reduced to (m-1)
         while i >= j:
             H_im = np.matmul(H_im, Hpair[i])
             i = i-1
-        Htemp.append(H_im)
+        #Htemp.append(H_im)
+        Htot.append(H_im)
 
-    for i in reversed(Htemp):
-        Htot.append(i)
+    # for i in reversed(Htemp):   #the order is ok
+    #     Htot.append(i)
 
     # i == m
     H_im = np.identity(3)
