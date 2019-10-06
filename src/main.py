@@ -22,6 +22,7 @@ import math
 from geometricTransformation import *
 from panoramaStitching import *
 from display import *
+
 pos1, pos2 = []
 
 def generatePanorama():
