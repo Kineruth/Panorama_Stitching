@@ -14,6 +14,8 @@ import random
 
 import argparse
 
+from main import pos1, pos2
+
 
 def findMatchFeatures(img1, img2):
     # -- Step 1: Detect the keypoints using SURF Detector, compute the descriptors
@@ -42,12 +44,13 @@ def findMatchFeatures(img1, img2):
             [x1, y1] = keypoints1[img1_idx].pt
             [x2, y2] = keypoints2[img2_idx].pt
             corrList.append([x1, y1, x2, y2])
-            #  pos2.append([x2, y2])
+            pos1.append([x1, y1])  # save for display lines
+            pos2.append([x2, y2])  # save for display lines
     #  print(corrList)
     return corrList
 
 
-def applyHomography(corrList, h):
+def applyHomography(corrList,h):
     #  transforms pos1 points (from image 1) to pos2 using the homography we found
     #  returns all estimated transposed points (from image 1 to image 2 using homography)
     estimatedPos2 = []
@@ -127,7 +130,7 @@ def ransacHomography(corrList, threshold):
         # NEED TO SEND P1 POINTS & H TO applyHomography, then calc Ej & inliers
         # runs over each pair of matched points [x1,y1,x'1,y'1]
 
-        inliers = geometricDistance(corrList, h, 5) # why inlierTol is 5 ??
+        inliers = geometricDistance(corrList, h, 5)  # why inlierTol is 5 ??
 
         if len(inliers) > len(maxInliers):
             maxInliers = inliers
