@@ -50,6 +50,7 @@ def generatePanorama():
     # ************************ AFTER RUNNING ALL PAIR IMAGES ************************
     m = math.ceil(len(my_images) / 2)  # Index of middle image rounded up, for common coordinate system
     Htot = accumulateHomographies(homography_list, m)
+    panoramaImage = renderPanorama(my_images, Htot)
 
 def main():
     generatePanorama()

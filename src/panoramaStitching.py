@@ -71,3 +71,8 @@ def accumulateHomographies(Hpair, m):  # m was not reduced to (m-1)
         Htot.append(H_im)
 
     return Htot
+
+def renderPanorama(im, H):
+    res = np.ndarray
+
+    return res
