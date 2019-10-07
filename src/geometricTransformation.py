@@ -26,8 +26,6 @@ def findMatchFeatures(img1, img2):
     # detector = cv.xfeatures2d_SURF.create(hessianThreshold=minHessian)
     keypoints1, descriptors1 = detector.detectAndCompute(img1, None)
     keypoints2, descriptors2 = detector.detectAndCompute(img2, None)
-    print("Found keypoints in 1: " + str(len(keypoints1)))
-    print("Found keypoints in 2: " + str(len(keypoints2)))
 
     # -- Step 2: Matches features given a list of keypoints, descriptors, & images with a Brute-Force based matcher
     # Since SIFT is a floating-point descriptor NORM_L2 is used
@@ -190,6 +188,6 @@ def drawMatches(img1, img2, inliers):
             counter2 += 1
         if inliers is None:
             cv.line(out, (int(pos1[i][0]), int(pos1[i][1])), (int(pos2[i][0]) + cols1, int(pos2[i][1])), (0, 0, 0), 1)
-    print("inliers: " + str(counter))
-    print("outliers: " + str(counter2))
+    #print("inliers: " + str(counter))
+    #print("outliers: " + str(counter2))
     return out

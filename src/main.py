@@ -23,35 +23,7 @@ from geometricTransformation import *
 from panoramaStitching import *
 
 
-def generatePanorama():
-    imagesDict = loadImagesFromFolder('../data/inp/examples')
-
-    for imgKey in imagesDict:  # runs over all images sequences that makes one new panorama
-        counter = 1
-        my_images = imagesDict[imgKey]
-
-        for k in my_images:  # runs over each consecutive pair of images
-            if k is None:
-                print('Could not open or find the images!')
-                exit(0)
-
-        homography_list = []  # size = len(my_images)-1
-
-        for k in range(len(my_images) - 1):  # each consecutive images
-            fileName = imgKey + str(counter)  # indexing output file name
-            corrList = findMatchFeatures(my_images[k], my_images[k + 1])
-            #  run RANSAC algorithm
-            homography, inliersList = ransacHomography(corrList, 0.75)
-            homography_list.append(homography)
-            displayMatches(my_images[k], my_images[k + 1], inliersList, fileName)
-            counter += 1  # to increase image indexing
-        # ************************ AFTER RUNNING ALL PAIR IMAGES ************************
-        m = math.ceil(len(my_images) / 2)  # Index of middle image rounded up, for common coordinate system
-        # Htot = accumulateHomographies(homography_list, m)
-
-
-
-def loadImagesFromFolder(folder):
+def loadImagesFromFolder(folder, flag):
     images = []
     imgName = ""
     imagesDict = OrderedDict()
@@ -68,13 +40,49 @@ def loadImagesFromFolder(folder):
             images = []  # new list of images for the panorama
 
         # image is for the same panorama
-        img = cv2.imread(os.path.join(folder, fileName), cv2.IMREAD_GRAYSCALE)
+        img = cv2.imread(os.path.join(folder, fileName), flag)
         if img is not None:
             images.append(img)
 
     # last image in folder, need to add the last list to dictionary
     imagesDict.setdefault(imgName, []).extend(images)
     return imagesDict
+
+
+def generatePanorama():
+    folderPath = '../data/inp/examples'
+    dictGBRImages = loadImagesFromFolder(folderPath, cv2.IMREAD_COLOR)
+    dictGrayImages = loadImagesFromFolder(folderPath, cv2.IMREAD_GRAYSCALE)
+
+    for imgKey in dictGrayImages:  # runs over all images sequences that makes one new panorama
+        counter = 1
+        my_images_GBR = dictGBRImages[imgKey]
+        my_images_gray = dictGrayImages[imgKey]
+
+        for k in my_images_gray:  # runs over each consecutive pair of images
+            if k is None:
+                print('Could not open or find the images!')
+                exit(0)
+
+        homography_list = []  # size = len(my_images)-1
+
+        for k in range(len(my_images_gray) - 1):  # each consecutive images
+            fileName = imgKey + str(counter)  # indexing output file name
+            corrList = findMatchFeatures(my_images_gray[k], my_images_gray[k + 1])
+            #  run RANSAC algorithm
+            homography, inliersList = ransacHomography(corrList, 0.75)
+            homography_list.append(homography)
+            displayMatches(my_images_gray[k], my_images_gray[k + 1], inliersList, fileName)
+            # to increase image indexing
+            counter += 1
+
+
+            # ************************ AFTER RUNNING ALL PAIR IMAGES ************************
+        m = math.ceil(len(my_images_gray) / 2) - 1  # Index of middle image rounded up, for common coordinate system
+        Htot = accumulateHomographies(homography_list, m)
+        print("Htot for " + imgKey +" with "+ str(m) +" :"+str(len(Htot)) + " Homography list: "+ " :"+str(len(homography_list)))
+        panoImg = renderPanorama(folderPath, my_images_GBR, Htot)
+        #outputPanorama(panoImg, imgKey)
 
 
 def main():
