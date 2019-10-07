@@ -25,7 +25,7 @@ from panoramaStitching import *
 
 
 def generatePanorama():
-
+    fileName = 'backyard12' #'../data/out/examples/matched images.png'
     img1 = cv.imread('../data/inp/examples/backyard1.jpg', cv.IMREAD_GRAYSCALE)
     img2 = cv.imread('../data/inp/examples/backyard2.jpg', cv.IMREAD_GRAYSCALE)
     #img3 = cv.imread('../data/inp/examples/backyard3.jpg', cv.IMREAD_GRAYSCALE)
@@ -42,9 +42,10 @@ def generatePanorama():
         print(k)
         corrList = findMatchFeatures(my_images[k], my_images[k + 1])
         #  run RANSAC algorithm
-        homography, inliersList = ransacHomography(corrList, 0.20)
+        homography, inliersList = ransacHomography(corrList, 0.60)
         homography_list.append(homography)
-        displayMatches(pos1, pos2, my_images[k], my_images[k + 1], inliersList)
+        displayMatches(my_images[k], my_images[k + 1], inliersList, fileName)
+
     # ************************ AFTER RUNNING ALL PAIR IMAGES ************************
     m = math.ceil(len(my_images) / 2)  # Index of middle image rounded up, for common coordinate system
     #Htot = accumulateHomographies(homography_list, m)
