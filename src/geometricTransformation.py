@@ -26,8 +26,8 @@ def findMatchFeatures(img1, img2):
     # detector = cv.xfeatures2d_SURF.create(hessianThreshold=minHessian)
     keypoints1, descriptors1 = detector.detectAndCompute(img1, None)
     keypoints2, descriptors2 = detector.detectAndCompute(img2, None)
-    print( "Found keypoints in 1: " + str(len(keypoints1)))
-    print( "Found keypoints in 2: " + str(len(keypoints2)))
+    print("Found keypoints in 1: " + str(len(keypoints1)))
+    print("Found keypoints in 2: " + str(len(keypoints2)))
 
     # -- Step 2: Matches features given a list of keypoints, descriptors, & images with a Brute-Force based matcher
     # Since SIFT is a floating-point descriptor NORM_L2 is used
@@ -38,14 +38,14 @@ def findMatchFeatures(img1, img2):
     min_dist = 80
     corrList = []
     for match in matches:
-        if match.distance <  2*min_dist:
-                img1_idx = match.queryIdx
-                img2_idx = match.trainIdx
-                [x1, y1] = keypoints1[img1_idx].pt
-                [x2, y2] = keypoints2[img2_idx].pt
-                corrList.append([x1, y1, x2, y2])
-                pos1.append([x1, y1])  # save for display lines
-                pos2.append([x2, y2])  # save for display lines
+        if match.distance < min_dist:  # more accurate is doing:  match.distance <  2* min_dist
+            img1_idx = match.queryIdx
+            img2_idx = match.trainIdx
+            [x1, y1] = keypoints1[img1_idx].pt
+            [x2, y2] = keypoints2[img2_idx].pt
+            corrList.append([x1, y1, x2, y2])
+            pos1.append([x1, y1])  # save for display lines
+            pos2.append([x2, y2])  # save for display lines
 
     return corrList
 
@@ -131,9 +131,8 @@ def ransacHomography(corrList, threshold):
 
         if len(maxInliers) > (len(corrList) * threshold):
             break
-    print("ransac MaxInliers: " + str(len(maxInliers)))
-    print("ransac homography: " + str(finalHomography))
     return finalHomography, maxInliers
+
 
 '''
     ! displayMatches FUNCTION !
@@ -148,7 +147,7 @@ def ransacHomography(corrList, threshold):
 
 def displayMatches(img1, img2, inliers, fileName):
     matchImg = drawMatches(img1, img2, inliers)
-    cv.imwrite('../data/out/examples/' + fileName + '.png', matchImg)
+    cv.imwrite('../data/out/displayMatches/' + fileName + '.png', matchImg)
 
 
 def drawMatches(img1, img2, inliers):
@@ -175,7 +174,7 @@ def drawMatches(img1, img2, inliers):
             for j in inliers:
                 if j[0] == pos1[i][0] and j[1] == pos1[i][1] and j[2] == pos2[i][0] and j[3] == pos2[i][1]:
                     inlier = True
-                    counter+=1
+                    counter += 1
 
         # Draw a small circle at both co-ordinates
         cv.circle(out, (int(pos1[i][0]), int(pos1[i][1])), 4, (0, 0, 255), 1)
@@ -183,11 +182,12 @@ def drawMatches(img1, img2, inliers):
 
         # Draw a line in between the two points, draw inliers if we have them
         if inliers is not None and inlier:
-            cv.line(out, (int(pos1[i][0]), int(pos1[i][1])), (int(pos2[i][0]) + cols1, int(pos2[i][1])), (0, 255,255), 1)
+            cv.line(out, (int(pos1[i][0]), int(pos1[i][1])), (int(pos2[i][0]) + cols1, int(pos2[i][1])), (0, 255, 255),
+                    1)
 
         elif inliers is not None:
-            cv.line(out, (int(pos1[i][0]), int(pos1[i][1])), (int(pos2[i][0]) + cols1, int(pos2[i][1])), (255,0,0), 1)
-            counter2+=1
+            cv.line(out, (int(pos1[i][0]), int(pos1[i][1])), (int(pos2[i][0]) + cols1, int(pos2[i][1])), (255, 0, 0), 1)
+            counter2 += 1
         if inliers is None:
             cv.line(out, (int(pos1[i][0]), int(pos1[i][1])), (int(pos2[i][0]) + cols1, int(pos2[i][1])), (0, 0, 0), 1)
     print("inliers: " + str(counter))
