@@ -14,13 +14,15 @@
     6) (back)wrap the images on to the strips of the panorama.
 '''
 
-import cv2 as cv
+import cv2 as cv2
 import numpy as np
 
 
-def accumulateHomographies(Hpair, m):  # m was not reduced to (m-1)
+def accumulateHomographies(Hpair, m):
     # Result
     Htot = []
+    i = 0
+
     if len(Hpair) == 2:  # only two frames
         H1 = np.matmul(Hpair[1], Hpair[0])
         H2 = np.identity(3)
@@ -30,49 +32,46 @@ def accumulateHomographies(Hpair, m):  # m was not reduced to (m-1)
         Htot.append(H3)
         return Htot
 
-    # more than 2 frames - 3 cases:
-    # CASE 1 --> i < m
-    for i in range(m):
-        H_im = Hpair[m]
-        k = m - 1
-        while k >= i:
-            H_im = np.matmul(H_im, Hpair[k])
-            k -= 1
-        # Htemp.append(H_im)
-        Htot.append(H_im)
+    while i <= len(Hpair):
 
-    # for i in reversed(Htemp): no need to reverse
-    #     Htot.append(i)
+        # more than 2 frames - 3 cases:
+        # CASE 1 --> i < m
+        if i < m:
+            H_im = Hpair[m]
+            k = m - 1
+            while k >= i:
+                H_im = np.matmul(H_im, Hpair[k])
+                k -= 1
+            Htot.append(H_im)
+            i += 1
 
-    '''
-    H_tot = [0] * len(Hpair)
-    H_down = Hpair[m]  #  already reduced by 1 after ceil(m/2)-1
-    for j in range(m-1,-1,-1):  # third is increment
-        H_down = H_down * Hpair[j]
-        H_tot[j] = H_down
-    # i == m
-    H_im = np.identity(3)
-    Htot.append(H_im)
-    '''
-    # CASE 2 --> i == m
-    if i == m:
-        H_im = np.identity(3)
-        Htot.append(H_im)
-        i += 1
+        # print("AFTER CASE 1 current index: "+ str(i))
+        # CASE 2 --> i == m
+        elif i == m:
+            H_im = np.identity(3)
+            Htot.append(H_im)
+            i += 1
 
-    # CASE 3 --> i > m
-    for i in range(m + 1, len(Hpair) - 1):
-        k = m + 1
-        H_im = np.linalg.inv(Hpair[m])
-        while k <= i:
-            inverseH = np.linalg.inv(Hpair[k])
-            H_im = np.matmul(H_im, inverseH)
-            k += 1
-        Htot.append(H_im)
 
+        # CASE 3 --> i > m
+        else:
+            k = m + 1
+            H_im = np.linalg.inv(Hpair[m])
+            while k < i:
+                inverseH = np.linalg.inv(Hpair[k])
+                H_im = np.matmul(H_im, inverseH)
+                k += 1
+            Htot.append(H_im)
+            i += 1
     return Htot
 
-def renderPanorama(im, H):
-    res = np.ndarray
 
-    return res
+def renderPanorama(folderPath, my_images_GBR, Htot):
+    panoImg = []
+
+    return panoImg
+
+
+
+def outputPanorama(panoImg, fileName):
+    cv2.imwrite('../data/out/example/' + fileName + '.png', panoImg)

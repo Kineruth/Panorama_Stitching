@@ -14,43 +14,76 @@
 '''
 
 from __future__ import print_function
-import cv2 as cv
-import numpy as np
-import argparse
+import cv2 as cv2
 import math
+import os
 
+from collections import OrderedDict
 from geometricTransformation import *
 from panoramaStitching import *
-from display import *
 
-pos1 = []
-pos2 = []
-matches = []
+
+def loadImagesFromFolder(folder, flag):
+    images = []
+    imgName = ""
+    imagesDict = OrderedDict()
+
+    for fileName in os.listdir(folder):
+        # first image in folder
+        if not imgName:
+            imgName = fileName[:-5]
+
+        # new images for new panorama
+        if fileName[:-5] != imgName:
+            imagesDict.setdefault(imgName, []).extend(images)
+            imgName = fileName[:-5]  # new name for new panorama
+            images = []  # new list of images for the panorama
+
+        # image is for the same panorama
+        img = cv2.imread(os.path.join(folder, fileName), flag)
+        if img is not None:
+            images.append(img)
+
+    # last image in folder, need to add the last list to dictionary
+    imagesDict.setdefault(imgName, []).extend(images)
+    return imagesDict
+
 
 def generatePanorama():
-    img1 = cv.imread('../data/inp/examples/backyard1.jpg', cv.IMREAD_GRAYSCALE)
-    img2 = cv.imread('../data/inp/examples/backyard2.jpg', cv.IMREAD_GRAYSCALE)
-    img3 = cv.imread('../data/inp/examples/backyard3.jpg', cv.IMREAD_GRAYSCALE)
-    my_images = [img1, img2, img3]
+    folderPath = '../data/inp/examples'
+    dictGBRImages = loadImagesFromFolder(folderPath, cv2.IMREAD_COLOR)
+    dictGrayImages = loadImagesFromFolder(folderPath, cv2.IMREAD_GRAYSCALE)
 
-    for k in my_images:
-        if k is None:
-            print('Could not open or find the images!')
-            exit(0)
+    for imgKey in dictGrayImages:  # runs over all images sequences that makes one new panorama
+        counter = 1
+        my_images_GBR = dictGBRImages[imgKey]
+        my_images_gray = dictGrayImages[imgKey]
 
-    homography_list = [] #size = len(my_images)-1
+        for k in my_images_gray:  # runs over each consecutive pair of images
+            if k is None:
+                print('Could not open or find the images!')
+                exit(0)
 
-    for k in range(len(my_images) - 1): #  each consecutive images
-        print(k)
-        corrList = findMatchFeatures(my_images[k], my_images[k + 1])
-        #  run RANSAC algorithm
-        homography, inliersList = ransacHomography(corrList, 0.60)
-        homography_list.append(homography)
-        displayMatches(pos1, pos2, my_images[k], my_images[k + 1], inliersList)
-    # ************************ AFTER RUNNING ALL PAIR IMAGES ************************
-    m = math.ceil(len(my_images) / 2)  # Index of middle image rounded up, for common coordinate system
-    Htot = accumulateHomographies(homography_list, m)
-    panoramaImage = renderPanorama(my_images, Htot)
+        homography_list = []  # size = len(my_images)-1
+
+        for k in range(len(my_images_gray) - 1):  # each consecutive images
+            fileName = imgKey + str(counter)  # indexing output file name
+            corrList = findMatchFeatures(my_images_gray[k], my_images_gray[k + 1])
+            #  run RANSAC algorithm
+            homography, inliersList = ransacHomography(corrList, 0.75)
+            homography_list.append(homography)
+            displayMatches(my_images_gray[k], my_images_gray[k + 1], inliersList, fileName)
+            # to increase image indexing
+            counter += 1
+
+
+            # ************************ AFTER RUNNING ALL PAIR IMAGES ************************
+        m = math.ceil(len(my_images_gray) / 2) - 1  # Index of middle image rounded up, for common coordinate system
+        Htot = accumulateHomographies(homography_list, m)
+        print("Htot for " + imgKey +" with "+ str(m) +" :"+str(len(Htot)) + " Homography list: "+ " :"+str(len(homography_list)))
+        panoImg = renderPanorama(folderPath, my_images_GBR, Htot)
+        #outputPanorama(panoImg, imgKey)
+
 
 def main():
     generatePanorama()
