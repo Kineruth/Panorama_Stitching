@@ -82,7 +82,8 @@ def generatePanorama():
         Htot = accumulateHomographies(homography_list, m)
         print("Htot for " + imgKey +" with "+ str(m) +" :"+str(len(Htot)) + " Homography list: "+ " :"+str(len(homography_list)))
         panoImg = renderPanorama(folderPath, my_images_GBR, Htot)
-        #outputPanorama(panoImg, imgKey)
+        # panoImg = StitchPanorama(my_images_GBR)
+        outputPanorama(panoImg, imgKey)
 
 
 def main():

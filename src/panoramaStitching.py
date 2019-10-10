@@ -16,6 +16,7 @@
 
 import cv2 as cv2
 import numpy as np
+# import Stitcher as stitch
 
 
 def accumulateHomographies(Hpair, m):
@@ -67,9 +68,39 @@ def accumulateHomographies(Hpair, m):
 
 
 def renderPanorama(folderPath, my_images_GBR, Htot):
-    panoImg = []
+    # Warp the blank back to original image space using inverse perspective matrix (Minv)
+    for i in range(len(my_images_GBR)):
+        img = my_images_GBR[i]
+        warped = cv2.warpPerspective(img, Htot[i], (img.shape[1], img.shape[0]))
+        if i == 0:
+            panoImg = img
+        panoImg = cv2.addWeighted(panoImg, 1, warped , 0.3, 0)
 
-    return panoImg
+    return trim(panoImg)
+
+def trim(frame):
+    # trims the black residue in the panorama image
+    #crop top
+    if not np.sum(frame[0]):
+        return trim(frame[1:])
+    #crop bottom
+    elif not np.sum(frame[-1]):
+        return trim(frame[:-2])
+    #crop left
+    elif not np.sum(frame[:,0]):
+        return trim(frame[:,1:])
+        #crop right
+    elif not np.sum(frame[:,-1]):
+        return trim(frame[:,:-2])
+    return frame
+
+
+def StitchPanorama(my_images_GBR):  #NOT GOOD DOES NOT DO WRAPPING
+    # stitch the images together to create a panorama
+    stitcher = cv2.createStitcher(False)
+    (status, stitched) = stitcher.stitch(my_images_GBR, showMatches=True)
+    # (result, vis) = stitcher.stitch(my_images_GBR, showMatches=True)  # result is panorama
+    return stitched
 
 
 def outputPanorama(panoImg, fileName):
