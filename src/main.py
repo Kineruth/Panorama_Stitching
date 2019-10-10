@@ -80,9 +80,8 @@ def generatePanorama():
             # ************************ AFTER RUNNING ALL PAIR IMAGES ************************
         m = math.ceil(len(my_images_gray) / 2) - 1  # Index of middle image rounded up, for common coordinate system
         Htot = accumulateHomographies(homography_list, m)
-
         print("Htot for " + imgKey +" with "+ str(m) +" :"+str(len(Htot)) + " Homography list: "+ " :"+str(len(homography_list)))
-        panoImg = renderPanorama(folderPath, my_images_gray, Htot)
+        panoImg = renderPanorama(folderPath, my_images_GBR, Htot)
         #outputPanorama(panoImg, imgKey)
 
 
