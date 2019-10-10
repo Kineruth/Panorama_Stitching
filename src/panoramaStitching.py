@@ -16,6 +16,8 @@
 
 import cv2 as cv2
 import numpy as np
+import matplotlib as plt
+import imutils
 
 
 def accumulateHomographies(Hpair, m):
@@ -67,10 +69,9 @@ def accumulateHomographies(Hpair, m):
 
 
 def renderPanorama(folderPath, my_images_GBR, Htot):
-    panoImg = []
+    panoImg = [];
 
     return panoImg
-
 
 
 def outputPanorama(panoImg, fileName):

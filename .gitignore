@@ -106,3 +106,10 @@ venv.bak/
 .idea/encodings.xml
 
 test.py
+
+data/out/displayMatches/backyard1.png
+data/out/displayMatches/backyard2.png
+ data/out/displayMatches/office1.png
+        modified:   data/out/displayMatches/office2.png
+        modified:   data/out/displayMatches/office3.png
+        modified:   data/out/displayMatches/oxford1.png
