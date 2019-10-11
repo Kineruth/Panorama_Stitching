@@ -97,3 +97,6 @@ def trim(frame):
 
 def outputPanorama(panoImg, fileName):
     cv2.imwrite('../data/out/example/' + fileName + '.png', panoImg)
+
+def outputPanorama_mine(panoImg, fileName):
+    cv2.imwrite('../data/out/mine/' + fileName + '.jpg', panoImg)
