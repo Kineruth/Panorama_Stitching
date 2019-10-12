@@ -49,7 +49,7 @@ def loadImagesFromFolder(folder, flag):
     return imagesDict
 
 
-def generatePanorama():
+def generatePanoramaExamples():
     folderPath = '../data/inp/examples'
     dictGBRImages = loadImagesFromFolder(folderPath, cv2.IMREAD_COLOR)
     dictGrayImages = loadImagesFromFolder(folderPath, cv2.IMREAD_GRAYSCALE)
@@ -81,13 +81,11 @@ def generatePanorama():
             # ************************ AFTER RUNNING ALL PAIR IMAGES ************************
         m = math.ceil(len(my_images_gray) / 2) - 1  # Index of middle image rounded up, for common coordinate system
         Htot = accumulateHomographies(homography_list, m)
-        print("Htot for " + imgKey + " with " + str(m) + " :" + str(len(Htot)) + " Homography list: " + " :" + str(
-            len(homography_list)))
         panoImg = renderPanorama(folderPath, my_images_GBR, Htot)
         outputPanorama(panoImg, imgKey)
 
 
-def generatePanorama_mine():
+def generatePanorama():
     folderPath = '../data/inp/mine'
     dictGBRImages = loadImagesFromFolder(folderPath, cv2.IMREAD_COLOR)
     dictGrayImages = loadImagesFromFolder(folderPath, cv2.IMREAD_GRAYSCALE)
@@ -116,15 +114,13 @@ def generatePanorama_mine():
             # ************************ AFTER RUNNING ALL PAIR IMAGES ************************
         m = math.ceil(len(my_images_gray) / 2) - 1  # Index of middle image rounded up, for common coordinate system
         Htot = accumulateHomographies(homography_list, m)
-        print("Htot for " + imgKey + " with " + str(m) + " :" + str(len(Htot)) + " Homography list: " + " :" + str(
-            len(homography_list)))
         panoImg = renderPanorama(folderPath, my_images_GBR, Htot)
         outputPanorama_mine(panoImg, imgKey)
 
 
 def main():
+    generatePanoramaExamples()
     generatePanorama()
-    generatePanorama_mine()
 
 
 if __name__ == "__main__":
