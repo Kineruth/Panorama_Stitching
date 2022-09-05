@@ -72,15 +72,17 @@ So we used  threshold=10 because it looked the most accurate for the eye.
 
 Our final results:
 --
-*	***DisplayMatches* images:**  
-![background1](https://github.com/Kineruth/Panorama_Stitching/tree/master/data/Readme%20Images/img1_backyard1.png)   
-![background2](https://github.com/Kineruth/Panorama_Stitching/tree/master/data/Readme%20Images/img2_backyard2.png)  
+1.	***DisplayMatches* images:**  
+ * images 1 + 2:  
+![background1](https://github.com/Kineruth/Panorama_Stitching/blob/master/data/Readme%20Images/img1_backyard1.png)  
+ * images 2 + 3:  
+![background2](https://github.com/Kineruth/Panorama_Stitching/blob/master/data/Readme%20Images/img2_backyard2.png)  
 
-*	**Panorama *Examples* folder output images:**	  
-![background](https://github.com/Kineruth/Panorama_Stitching/tree/master/data/Readme%20Images/img3_backyard.png)  
-![office](https://github.com/Kineruth/Panorama_Stitching/tree/master/data/Readme%20Images/img4_office.png)  
-![oxford](https://github.com/Kineruth/Panorama_Stitching/tree/master/data/Readme%20Images/img5_oxford.png)  
+2.	**Panorama output images (*Examples* folder):**	  
+![background](https://github.com/Kineruth/Panorama_Stitching/blob/master/data/Readme%20Images/img3_backyard.png)  
+![office](https://github.com/Kineruth/Panorama_Stitching/blob/master/data/Readme%20Images/img4_office.png)  
+![oxford](https://github.com/Kineruth/Panorama_Stitching/blob/master/data/Readme%20Images/img5_oxford.png)  
 
-* **Panorama *Mine* folder output images:**  
-![view](https://github.com/Kineruth/Panorama_Stitching/tree/master/data/Readme%20Images/img6_m.png)   
-![room](https://github.com/Kineruth/Panorama_Stitching/tree/master/data/Readme%20Images/img7_room.png)   
+3. **Panorama output images (*Mine* folder):**  
+![view](https://github.com/Kineruth/Panorama_Stitching/blob/master/data/Readme%20Images/img6_m.jpg)   
+![room](https://github.com/Kineruth/Panorama_Stitching/blob/master/data/Readme%20Images/img7_room.jpg)   
